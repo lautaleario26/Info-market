@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.math.BigDecimal; 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -26,7 +27,7 @@ public class Producto {
     private String nombre;
     @Column(nullable = false)
     private String descripcion;
-    private double precio;
+    private BigDecimal precio; 
     private int stock;
     private LocalDate fechaDeCreacion;
     private LocalDate fechaActualizacion;
@@ -36,7 +37,7 @@ public class Producto {
 
     public Producto() {}
 
-    public Producto(UUID id, String nombre, String descripcion, double precio, int stock, LocalDate fechaDeCreacion, LocalDate fechaActualizacion, List<Categoria> categorias) {
+    public Producto(UUID id, String nombre, String descripcion, BigDecimal precio, int stock, LocalDate fechaDeCreacion, LocalDate fechaActualizacion, List<Categoria> categorias) {
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
@@ -71,11 +72,11 @@ public class Producto {
         this.descripcion = descripcion;
     }
 
-    public double getPrecio() {
+    public BigDecimal getPrecio() { 
         return precio;
     }
 
-    public void setPrecio(double precio) {
+    public void setPrecio(BigDecimal precio) { 
         this.precio = precio;
     }
 

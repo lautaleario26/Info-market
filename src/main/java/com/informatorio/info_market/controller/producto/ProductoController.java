@@ -1,8 +1,10 @@
+
 package com.informatorio.info_market.controller.producto;
 
 import com.informatorio.info_market.dto.error.ErrorResponseDto;
 import com.informatorio.info_market.dto.producto.ProductoCreateDto;
 import com.informatorio.info_market.dto.producto.ProductoDto;
+import com.informatorio.info_market.dto.producto.ProductoEnCarritoAbiertoDTO; 
 import com.informatorio.info_market.service.producto.ProductoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -16,7 +18,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal; 
 import java.net.URI;
+import java.time.LocalDate; 
 import java.util.List;
 import java.util.UUID;
 
@@ -24,13 +28,14 @@ import java.util.UUID;
         name = "Productos REST APIs",
         description = "REST APIs del Proyecto para realizar un CRUD de productos"
 )
-@RestController //Anotacion a nivel de clase
-@RequestMapping("/api/v1/productos")
+@RestController 
+@RequestMapping("/api/v1/productos") 
 public class ProductoController {
 
-    @Autowired //Anotacion a nivel de atributo
+    @Autowired 
     private ProductoService productoService;
 
+    
     public ProductoController(ProductoService productoService) {
         this.productoService = productoService;
     }
@@ -45,7 +50,7 @@ public class ProductoController {
                     description = "HTTP Request Success"
             )
     })
-    @GetMapping()//Anotacion a nivel de metodo
+    @GetMapping() 
     public List<ProductoDto> getAllProductos(
             @RequestParam(value = "minStock", defaultValue = "0", required = false) int minStock,
             @RequestParam(value = "minPrice", defaultValue = "0", required = false) Double minPrice,
@@ -170,7 +175,7 @@ public class ProductoController {
     @DeleteMapping("/{productoId}")
     public void deleteProductoById(@PathVariable UUID productoId) {
         productoService.deleteProducto(productoId);
-        ResponseEntity.noContent().build();
+        
     }
 
     @GetMapping("/query")
@@ -178,5 +183,25 @@ public class ProductoController {
         return productoService.testProductsQueries();
     }
 
+    
 
+    @Operation(
+            summary = "Obtener productos con stock 0 en carritos abiertos",
+            description = "REST API para obtener todos los productos que tienen stock 0 y se encuentran en carritos con estado 'ABIERTO'. Permite filtrar opcionalmente por precio máximo y/o fecha de creación mínima."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "HTTP Request Success",
+                    content = @Content(
+                            schema = @Schema(implementation = ProductoEnCarritoAbiertoDTO.class) 
+                    )
+            )
+    })
+    @GetMapping("/stock-cero-en-carritos-abiertos")
+    public List<ProductoEnCarritoAbiertoDTO> getProductosConStockCeroEnCarritosAbiertos(
+            @RequestParam(required = false) BigDecimal precioMax,
+            @RequestParam(required = false) LocalDate fechaCreacionMin) {
+        return productoService.obtenerProductosConStockCeroEnCarritosAbiertos(precioMax, fechaCreacionMin);
+    }
 }

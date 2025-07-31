@@ -2,6 +2,7 @@ package com.informatorio.info_market.repository.producto;
 
 import com.informatorio.info_market.domain.Producto;
 
+import java.math.BigDecimal; 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +16,7 @@ public class ProductoRepositoryStub {
         producto.setId( UUID.randomUUID() );
         producto.setNombre( "Producto" );
         producto.setDescripcion( "Descripcion" );
-        producto.setPrecio( 10 );
+        producto.setPrecio( new BigDecimal("10.00") ); 
         producto.setStock( 200 );
         producto.setFechaDeCreacion( LocalDate.now() );
         producto.setFechaActualizacion( LocalDate.now() );
@@ -24,7 +25,7 @@ public class ProductoRepositoryStub {
         producto2.setId( UUID.randomUUID() );
         producto2.setNombre( "Producto 2" );
         producto2.setDescripcion( "Descripcion 2" );
-        producto2.setPrecio( 20 );
+        producto2.setPrecio( new BigDecimal("20.00") ); 
         producto2.setStock( 1200 );
         producto2.setFechaDeCreacion( LocalDate.now() );
         producto2.setFechaActualizacion( LocalDate.now() );

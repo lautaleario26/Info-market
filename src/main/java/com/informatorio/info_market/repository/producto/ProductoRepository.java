@@ -1,26 +1,29 @@
 package com.informatorio.info_market.repository.producto;
 
 import com.informatorio.info_market.domain.Producto;
+import com.informatorio.info_market.domain.Carrito; 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal; 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-public interface ProductoRepository extends JpaRepository<Producto, UUID> {
-    //Query Methods
-    //Filtro por minStock , min Price y maxPrice
+public interface ProductoRepository extends JpaRepository<Producto, UUID> { 
+
+    // Query Methods
+    // Filtro por minStock , min Price y maxPrice
     List<Producto> findAllByStockIsGreaterThanAndPrecioIsBetween(int stockMin, Double minPrice, Double maxPrice);
 
-    //Filtrar por maxPrice
+    // Filtrar por maxPrice
     List<Producto> findAllByPrecioIsLessThan(Double precio);
 
-    //Filtrar por min stock
+    // Filtrar por min stock
     List<Producto> findAllByStockIsGreaterThan(int stockMin);
 
-    //HQL
+    // HQL
     @Query("SELECT p FROM Producto p WHERE p.precio > :minPrecio")
     List<Producto> obtenerTodosLosProductosConUnPrecioMayorA(Double minPrecio);
 
@@ -30,10 +33,10 @@ public interface ProductoRepository extends JpaRepository<Producto, UUID> {
     @Query("SELECT DISTINCT p FROM Producto p JOIN p.categorias c WHERE c.nombre = :nombreCategoria")
     List<Producto> obtenerTodosLosProductosConNombreCategoria(String nombreCategoria);
 
-    @Query("SELECT p.id, p.nombre FROM Producto p WHERE SIZE(p.categorias)  > 1")
+    @Query("SELECT p.id, p.nombre FROM Producto p WHERE SIZE(p.categorias) > 1")
     List<Producto> obtenerTodosLosProductoConMasDeUnaCategoria();
 
-    //NATIVE QUERY - SQL
+    // NATIVE QUERY - SQL
     @Query(value = "SELECT * FROM producto WHERE fecha_de_creacion > :fecha", nativeQuery = true)
     List<Producto> obtenerProductosCreadosDespuesDe(@Param("fecha") LocalDate fecha);
 
@@ -44,4 +47,16 @@ public interface ProductoRepository extends JpaRepository<Producto, UUID> {
     WHERE c.nombre = :nombreCategoria
     """, nativeQuery = true)
     List<Producto> obtenerTodosLosProductosConNombreCategoriaNative(@Param("nombreCategoria") String nombreCategoria);
+
+     
+    @Query("SELECT p FROM Producto p " +
+           "JOIN ItemCarrito ic ON p.id = ic.producto.id " +
+           "JOIN Carrito c ON ic.carrito.id = c.id " +
+           "WHERE p.stock = 0 AND c.estadoCarrito = 'ABIERTO' " + 
+           "AND (:precioMax IS NULL OR p.precio <= :precioMax) " +
+           "AND (:fechaCreacionMin IS NULL OR p.fechaDeCreacion >= :fechaCreacionMin)") 
+    List<Producto> findProductosConStockCeroEnCarritosAbiertos(
+            @Param("precioMax") BigDecimal precioMax,
+            @Param("fechaCreacionMin") LocalDate fechaCreacionMin
+    );
 }

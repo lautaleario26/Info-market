@@ -1,8 +1,10 @@
+
 package com.informatorio.info_market.service.producto.impl;
 
 import com.informatorio.info_market.domain.Producto;
 import com.informatorio.info_market.dto.producto.ProductoCreateDto;
 import com.informatorio.info_market.dto.producto.ProductoDto;
+import com.informatorio.info_market.dto.producto.ProductoEnCarritoAbiertoDTO; 
 import com.informatorio.info_market.exception.badrequest.StockInsuficienteException;
 import com.informatorio.info_market.exception.notfound.NotFoundException;
 import com.informatorio.info_market.mapper.producto.ProductoCreateMapper;
@@ -12,19 +14,18 @@ import com.informatorio.info_market.service.producto.ProductoService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal; 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@AllArgsConstructor
+@AllArgsConstructor 
 public class ProductoServiceImpl implements ProductoService {
 
     private final ProductoRepository productoRepository;
-
     private final ProductoMapper productoMapper;
-
     private final ProductoCreateMapper productoCreateMapper;
 
     @Override
@@ -51,7 +52,7 @@ public class ProductoServiceImpl implements ProductoService {
     public ProductoDto getProductoById(UUID id) {
         Optional<Producto> producto = productoRepository.findById(id);
         if (producto.isPresent()) {
-            return productoMapper.productoToProductoDto( producto.get() );
+            return productoMapper.productoToProductoDto( producto.get() ); 
         }else{
             throw new NotFoundException("No se encontro el producto con id : " + id);
         }
@@ -61,7 +62,7 @@ public class ProductoServiceImpl implements ProductoService {
     public Producto getProductoEntityById(UUID id) {
         Optional<Producto> producto = productoRepository.findById(id);
         if (producto.isPresent()) {
-            return  producto.get() ;
+            return producto.get() ;
         }else{
             throw new NotFoundException("No se encontro el producto con id : " + id);
         }
@@ -101,7 +102,7 @@ public class ProductoServiceImpl implements ProductoService {
     @Override
     public void descontarStock(Producto producto, int cantidad) {
         if ( producto.getStock() < cantidad ){
-            //Ejecutar excepcion
+            
             throw new StockInsuficienteException("No existe stock suficiente del producto");
         }else {
             producto.setStock(producto.getStock() - cantidad);
@@ -114,9 +115,9 @@ public class ProductoServiceImpl implements ProductoService {
 
         if (productoRepository.existsById( id )){
             productoRepository.deleteById(id);
+        } else { 
+            throw new NotFoundException("No se encontro el producto con id : " + id);
         }
-
-        throw new NotFoundException("No se encontro el producto con id : " + id);
     }
 
     @Override
@@ -131,4 +132,21 @@ public class ProductoServiceImpl implements ProductoService {
                 .toList();
     }
 
+   
+    @Override 
+    public List<ProductoEnCarritoAbiertoDTO> obtenerProductosConStockCeroEnCarritosAbiertos(
+            BigDecimal precioMax,
+            LocalDate fechaCreacionMin) {
+
+        
+        LocalDate fechaMinParaConsulta = (fechaCreacionMin != null) ? fechaCreacionMin : LocalDate.now();
+
+        
+        List<Producto> productos = productoRepository.findProductosConStockCeroEnCarritosAbiertos(
+                precioMax,
+                fechaMinParaConsulta
+        );
+        
+        return productoMapper.toProductoEnCarritoAbiertoDTOList(productos);
+    }
 }

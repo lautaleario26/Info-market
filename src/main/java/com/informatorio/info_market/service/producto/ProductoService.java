@@ -3,7 +3,10 @@ package com.informatorio.info_market.service.producto;
 import com.informatorio.info_market.domain.Producto;
 import com.informatorio.info_market.dto.producto.ProductoCreateDto;
 import com.informatorio.info_market.dto.producto.ProductoDto;
+import com.informatorio.info_market.dto.producto.ProductoEnCarritoAbiertoDTO; 
 
+import java.math.BigDecimal; 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,4 +26,9 @@ public interface ProductoService {
     void deleteProducto(UUID id);
 
     List<ProductoDto> testProductsQueries();
+
+    
+    List<ProductoEnCarritoAbiertoDTO> obtenerProductosConStockCeroEnCarritosAbiertos(
+            BigDecimal precioMax,
+            LocalDate fechaCreacionMin);
 }
